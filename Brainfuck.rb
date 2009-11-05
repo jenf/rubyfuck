@@ -1,14 +1,14 @@
-core :Brainfuck "A Brainfuck CPU" do
-  opcode ">" { dp+=1 }
-  opcode "<" { dp-=1 }
-  opcode "+" { mem[dp]+=1}
-  opcode "-" { mem[dp]-=1}
-  opcode "." { putc mem[dp] }
-  opcode "," { mem[dp] = STDIN.getc }
-  opcode "[" do |x|
+core :Brainfuck=>"A Brainfuck CPU" do
+  opcode ">" do dp+=1 end
+  opcode "<" do dp-=1 end
+  opcode "+" do mem[dp]+=1 end
+  opcode "-" do mem[dp]-=1 end
+  opcode "." do putc mem[dp] end
+  opcode "," do mem[dp] = STDIN.getc end
+  opcode "[" do
     if (0 == mem[dp])
       count = 1
-      while x != 0
+      while mem[pc] != 0
         pc +=1
         if mem[pc]== 91 # [
           count+=1
@@ -18,11 +18,11 @@ core :Brainfuck "A Brainfuck CPU" do
       end
     end
   end
-  opcode "]" do |x|
+  opcode "]" do
     # Urgh
   end
 
   memsize :name=>mem,:size=>30000 # Classical brainfuck
-  pc :name=>:pc,:start=0
+  pc :name=>:pc,:start=>0
   register :name=>:dp,:var=>:dp
 end
