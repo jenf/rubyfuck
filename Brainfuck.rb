@@ -29,12 +29,9 @@ opcode "]" do
     count = 1
     while count != 0
       @pc -=1
-#      puts "%i %i" % [@pc,@rom[@pc]]
       if @rom[@pc]== 91 # [
-#        puts "] [ %i" % count
         count-=1
       elsif @rom[@pc]== 93 # ]
-#        puts "] ] %i" % count
         count+=1
       end
     end
