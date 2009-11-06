@@ -5,7 +5,7 @@ class CPUCore
   @core.load(ARGV[0])
  end
  def begin
-  puts @core.inspect
+#  debug @core.inspect
   @core.run
 #  puts @core.inspect
  end
@@ -16,7 +16,9 @@ class CPULoader
   @opcodes = {}
   @regs = []
  end
- 
+ def debug(a)
+  #puts a
+ end
  def load(*args, &block)
   # Convert a parameter to a hash.
   options = args.last.is_a?(Hash) ? args.pop : {}
@@ -35,7 +37,7 @@ class CPULoader
   options = args.last.is_a?(Hash) ? args.pop : {}
   args.each { |arg| opcode options.merge(:opcode=>arg), &block }
   return unless args.empty?
-  puts "Defining opcode " + (options.inspect)
+  debug "Defining opcode " + (options.inspect)
   opcode = options[:opcode]
   opcode = opcode[0] if opcode.is_a?(String)
   @opcodes[opcode] = block
@@ -46,12 +48,12 @@ class CPULoader
  end
  def pc(args)
   @pc=args[:start]
-  puts args.inspect
+  debug args.inspect
  end
  def register(args)
   instance_variable_set(args[:name],0)
   @regs << args[:name]
-  puts args.inspect
+  debug args.inspect
  end
  def rom(options)
   if options[:file]
@@ -60,7 +62,7 @@ class CPULoader
   elsif options[:string]
    @rom = options[:string]
   end
-  puts options.inspect
+  debug options.inspect
  end
  
  def run()
@@ -68,12 +70,12 @@ class CPULoader
    j = @rom[@pc]
    return if nil == j
    values = {}
-   #puts "%x PC: %i %i %i" % [j, @pc, @dp, @mem[@dp]]
+   #debug "%x PC: %i %i %i" % [j, @pc, @dp, @mem[@dp]]
    if @opcodes.include?(j)
-    #puts @opcodes[j].inspect
+    #debug @opcodes[j].inspect
     k = @opcodes[j].call
     values.merge(k) if k.is_a?(Hash)
-    #puts "Return : " + k.inspect
+    #debug "Return : " + k.inspect
    end
    @pc+=1 unless values[:no_inc_pc]==true
   end
