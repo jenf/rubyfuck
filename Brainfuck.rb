@@ -8,7 +8,7 @@ core :Brainfuck=>"A Brainfuck CPU" do
   opcode "[" do
     if (0 == mem[dp])
       count = 1
-      while mem[pc] != 0
+      while count != 0
         pc +=1
         if mem[pc]== 91 # [
           count+=1
@@ -19,7 +19,18 @@ core :Brainfuck=>"A Brainfuck CPU" do
     end
   end
   opcode "]" do
-    # Urgh
+    if (0 == mem[dp])
+      count = 1
+      while count != 0
+        pc -=1
+        if mem[pc]== 91 # [
+          count-=1
+        elsif mem[pc]== 93 # ]
+          count+=1
+        end
+      end
+    end
+    :no_inc_pc
   end
 
   memsize :name=>mem,:size=>30000 # Classical brainfuck
