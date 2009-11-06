@@ -1,3 +1,4 @@
+
 class CPUCore
  def initialize()
   @core = CPULoader.new()
@@ -13,6 +14,7 @@ end
 class CPULoader
  def initialize()
   @opcodes = {}
+  @regs = []
  end
  
  def load(*args, &block)
@@ -40,7 +42,7 @@ class CPULoader
  end
 
  def mem(args)
-  @mem=Array.new(args[:size],0)
+  @mem="\0" * args[:size]
  end
  def pc(args)
   @pc=args[:start]
@@ -48,6 +50,7 @@ class CPULoader
  end
  def register(args)
   instance_variable_set(args[:name],0)
+  @regs << args[:name]
   puts args.inspect
  end
  def rom(options)
@@ -65,7 +68,7 @@ class CPULoader
    j = @rom[@pc]
    return if nil == j
    values = {}
-   #puts "%x PC: %i" % [j, @pc]
+   #puts "%x PC: %i %i %i" % [j, @pc, @dp, @mem[@dp]]
    if @opcodes.include?(j)
     #puts @opcodes[j].inspect
     k = @opcodes[j].call
