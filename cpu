@@ -1,0 +1,4 @@
+#!/usr/bin/ruby
+require 'CPUCore.rb'
+
+CPUCore.new().begin
