@@ -4,12 +4,14 @@ class CPUCore
   @core.load(ARGV[0])
  end
  def begin
+  puts @core.inspect
   puts "Start!"
  end
 end
 
 class CPULoader
  def initialize()
+  @opcodes = {}
  end
  
  def load(*args, &block)
@@ -28,21 +30,33 @@ class CPULoader
  
  def opcode(*args,&block)
   options = args.last.is_a?(Hash) ? args.pop : {}
-  args.each { |arg| opcode options.merge(:code=>arg) }
+  args.each { |arg| opcode options.merge(:opcode=>arg), &block }
   return unless args.empty?
   puts "Defining opcode " + (options.inspect)
+  @opcodes[options[:opcode]] = block
  end
  
  def memsize(args)
+  
   puts args.inspect
  end
  def pc(args)
+  @pc=args[:start]
   puts args.inspect
  end
  def register(args)
   puts args.inspect
  end
- def rom(args)
-  puts args.inspect
+ def rom(options)
+  if options[:file]
+   file = options[:file]
+   rom :string => File.read(file), :name => options[:name] || file
+  elsif options[:string]
+   @rom = options[:string]
+  end
+  puts options.inspect
+ end
+ 
+ def run()
  end
 end

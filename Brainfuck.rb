@@ -33,6 +33,6 @@ opcode "]" do
 end
 
 memsize :name=>:mem,:size=>30000 # Classical brainfuck
-pc :name=>:pc,:start=>0
+pc :start=>0
 register :name=>:dp,:var=>:dp
 rom :file=>ARGV[1],:invisible_codespace=>true
