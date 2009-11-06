@@ -2,10 +2,13 @@ opcode ">" do @dp+=1 end
 opcode "<" do @dp-=1 end
 opcode "+" do @mem[@dp]+=1 end
 opcode "-" do @mem[@dp]-=1 end
-opcode "." do putc @mem[@dp] end
+opcode "." do
+ $stdout.putc @mem[@dp]
+ $stdout.flush
+end
 opcode "," do
- a = STDIN.getc
- exit if a = nil
+ a = $stdin.getc
+ a = 0 if a == nil
  @mem[@dp] = a
 end
 opcode "[" do

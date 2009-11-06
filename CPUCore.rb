@@ -6,6 +6,7 @@ class CPUCore
  def begin
   puts @core.inspect
   @core.run
+#  puts @core.inspect
  end
 end
 
@@ -62,7 +63,7 @@ class CPULoader
  def run()
   while true
    j = @rom[@pc]
-   exit if nil == j
+   return if nil == j
    values = {}
    #puts "%x PC: %i" % [j, @pc]
    if @opcodes.include?(j)
