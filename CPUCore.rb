@@ -35,16 +35,16 @@ class CPULoader
   puts "Defining opcode " + (options.inspect)
   @opcodes[options[:opcode]] = block
  end
- 
- def memsize(args)
-  
-  puts args.inspect
+
+ def mem(args)
+  @mem=Array.new(args[:size],0)
  end
  def pc(args)
   @pc=args[:start]
   puts args.inspect
  end
  def register(args)
+  instance_variable_set(args[:name],0)
   puts args.inspect
  end
  def rom(options)
@@ -58,5 +58,6 @@ class CPULoader
  end
  
  def run()
+  
  end
 end
