@@ -5,7 +5,7 @@ class CPUCore
  end
  def begin
   puts @core.inspect
-  puts "Start!"
+  @core.run
  end
 end
 
@@ -33,7 +33,9 @@ class CPULoader
   args.each { |arg| opcode options.merge(:opcode=>arg), &block }
   return unless args.empty?
   puts "Defining opcode " + (options.inspect)
-  @opcodes[options[:opcode]] = block
+  opcode = options[:opcode]
+  opcode = opcode[0] if opcode.is_a?(String)
+  @opcodes[opcode] = block
  end
 
  def mem(args)
@@ -58,6 +60,18 @@ class CPULoader
  end
  
  def run()
-  
+  while true
+   j = @rom[@pc]
+   exit if nil == j
+   values = {}
+   #puts "%x PC: %i" % [j, @pc]
+   if @opcodes.include?(j)
+    #puts @opcodes[j].inspect
+    k = @opcodes[j].call
+    values.merge(k) if k.is_a?(Hash)
+    #puts "Return : " + k.inspect
+   end
+   @pc+=1 unless values[:no_inc_pc]==true
+  end
  end
 end
