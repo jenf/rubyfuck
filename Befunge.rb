@@ -26,7 +26,7 @@ opcode 'g' do
  # This does not have multidimension support yet.
  y=@stack.pop_zero
  x=@stack.pop_zero
- @stack.push(@rom[x])
+ @stack.push(@rom[0][x])
 end
 opcode '`' do
  a=@stack.pop_zero
@@ -53,7 +53,7 @@ special_mode '"' do |x|
 end
 
 pc_read = Proc.new {
- @rom[@pc[0]]
+ @rom[0][@pc[0]]
 }
 
 pc :start=>[0,0], :pc_read=>pc_read do |values|
@@ -63,11 +63,12 @@ pc :start=>[0,0], :pc_read=>pc_read do |values|
   @pc[0]+=times if @pc_direction==:right
   @pc[0]-=times if @pc_direction==:left
   # This isn't correct.
-  @pc[0] = 0 if @pc[0]==@rom.length
-  @pc[0] = @rom.length-1 if @pc[0]==-1
+  @pc[0] = 0 if @pc[0]==@rom[0].length
+  @pc[0] = @rom[0].length-1 if @pc[0]==-1
  end
 end
 
-rom :file=>ARGV[1],:invisible_codespace=>true
+h=IO.readlines(ARGV[1])
+rom :string=>h,:invisible_codespace=>true
 register :name=>:@stack,:initial=>[]
 register :name=>:@pc_direction,:initial=>:right
