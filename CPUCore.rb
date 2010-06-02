@@ -1,3 +1,10 @@
+class Array
+ def pop_zero
+  j=self.pop
+  j=0 if j==nil
+  return j
+ end
+end
 
 class CPUCore
  def initialize()
@@ -20,7 +27,7 @@ class CPULoader
   @pc_block = nil
  end
  def debug(a)
-  #puts a
+#  puts a
  end
  def load(*args, &block)
   # Convert a parameter to a hash.

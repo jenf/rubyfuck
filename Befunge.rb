@@ -3,8 +3,7 @@ opcode "@" do exit end
 opcode ">" do @pc_direction=:right end
 opcode "<" do @pc_direction=:left end
 opcode "_" do
- k=@stack.pop # This isn't specified but appears to be the behaviour.
- k=0 if k==nil
+ k=@stack.pop_zero # This isn't specified but appears to be the behaviour.
  @pc_direction = :left if k!=0
  @pc_direction = :right if k==0
 end
@@ -23,6 +22,28 @@ opcode '6' do @stack.push(6) end
 opcode '7' do @stack.push(7) end
 opcode '8' do @stack.push(8) end
 opcode '9' do @stack.push(9) end
+opcode 'g' do
+ # This does not have multidimension support yet.
+ y=@stack.pop_zero
+ x=@stack.pop_zero
+ @stack.push(@rom[x])
+end
+opcode '`' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push 1 if b>a
+ @stack.push 0 unless b>a
+end
+opcode '+' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(b+a)
+end
+opcode '-' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(b-a)
+end
 
 
 special_mode '"' do |x|
@@ -37,6 +58,9 @@ pc :start=>0 do |values|
   times=values[:repeat_pc] unless values[:repeat_pc]==nil
   @pc+=times if @pc_direction==:right
   @pc-=times if @pc_direction==:left
+  # This isn't correct.
+  @pc = 0 if @pc==@rom.length
+  @pc = @rom.length-1 if @pc==-1
  end
 end
 
