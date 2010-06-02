@@ -1,5 +1,5 @@
 Full Brainfuck support (I believe)
-Partial Befunge support (enough to run hello world)
+Full Befunge 93 support (Passes fungus b93)
 
 To run
 

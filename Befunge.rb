@@ -16,6 +16,7 @@ opcode "?" do
  end
 end
 
+# Conditional Jumps
 opcode "_" do
  k=@stack.pop_zero # This isn't specified but appears to be the behaviour.
  @pc_direction = :left if k!=0
@@ -105,16 +106,17 @@ opcode '-' do
  b=@stack.pop_zero
  @stack.push(b-a)
 end
-opcode '/' do
- a=@stack.pop_zero
- b=@stack.pop_zero
- @stack.push(b/a)
-end
 opcode '*' do
  a=@stack.pop_zero
  b=@stack.pop_zero
  @stack.push(b*a)
 end
+opcode '/' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(b/a)
+end
+
 opcode '%' do
  a=@stack.pop_zero
  b=@stack.pop_zero
@@ -147,7 +149,18 @@ pc :start=>[0,0], :pc_read=>pc_read do |values|
  end
 end
 
-h=IO.readlines(ARGV[1])
+h=IO.readlines(ARGV[1]).collect {|line| line.chomp}
+
+# Find the maximum length to allow negatives to work correctly
+max = 0
+h.each {|x|
+v = x.length
+max = v if v>max
+}
+
+h.map! {|x|
+ x=x+(" "*(max-x.length))
+}
 rom :string=>h,:invisible_codespace=>true
 register :name=>:@stack,:initial=>[]
 register :name=>:@pc_direction,:initial=>:right
