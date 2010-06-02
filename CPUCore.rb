@@ -4,6 +4,16 @@ class Array
   j=0 if j==nil
   return j
  end
+ 
+ def round(x)
+  return self[x % self.length]
+ end
+end
+
+class String
+ def round(x)
+  return self[x % self.length]
+ end
 end
 
 class CPUCore

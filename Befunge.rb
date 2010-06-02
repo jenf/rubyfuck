@@ -23,10 +23,9 @@ opcode '7' do @stack.push(7) end
 opcode '8' do @stack.push(8) end
 opcode '9' do @stack.push(9) end
 opcode 'g' do
- # This does not have multidimension support yet.
  y=@stack.pop_zero
  x=@stack.pop_zero
- @stack.push(@rom[0][x])
+ @stack.push(@rom.round(y).round(x))
 end
 opcode '`' do
  a=@stack.pop_zero
@@ -53,7 +52,7 @@ special_mode '"' do |x|
 end
 
 pc_read = Proc.new {
- @rom[0][@pc[0]]
+ @rom.round(@pc[1]).round(@pc[0])
 }
 
 pc :start=>[0,0], :pc_read=>pc_read do |values|
@@ -62,9 +61,8 @@ pc :start=>[0,0], :pc_read=>pc_read do |values|
   times=values[:repeat_pc] unless values[:repeat_pc]==nil
   @pc[0]+=times if @pc_direction==:right
   @pc[0]-=times if @pc_direction==:left
-  # This isn't correct.
-  @pc[0] = 0 if @pc[0]==@rom[0].length
-  @pc[0] = @rom[0].length-1 if @pc[0]==-1
+  @pc[1]+=times if @pc_direction==:up
+  @pc[1]-=times if @pc_direction==:down
  end
 end
 
