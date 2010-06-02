@@ -25,6 +25,7 @@ class CPULoader
   @special_mode = []
   @special_modes = {}
   @pc_block = nil
+  @pc_args = {}
  end
  def debug(a)
 #  puts a
@@ -66,7 +67,9 @@ class CPULoader
  def mem(args)
   @mem="\0" * args[:size]
  end
+ 
  def pc(args,&block)
+  @pc_args = args
   @pc=args[:start]
   @pc_block = block
   debug args.inspect
@@ -101,7 +104,8 @@ class CPULoader
  
  def run()
   while true
-   j = @rom[@pc]
+   j = @rom[@pc] unless @pc_args.include? :pc_read
+   j = @pc_args[:pc_read].call if @pc_args.include? :pc_read
    return if nil == j
    values = {}
    #debug "%x PC: %i %i %i" % [j, @pc, @dp, @mem[@dp]]

@@ -52,15 +52,19 @@ special_mode '"' do |x|
  pop_special_mode if x=='"'[0]
 end
 
-pc :start=>0 do |values|
+pc_read = Proc.new {
+ @rom[@pc[0]]
+}
+
+pc :start=>[0,0], :pc_read=>pc_read do |values|
  if values[:no_inc_pc]!=true
   times=1
   times=values[:repeat_pc] unless values[:repeat_pc]==nil
-  @pc+=times if @pc_direction==:right
-  @pc-=times if @pc_direction==:left
+  @pc[0]+=times if @pc_direction==:right
+  @pc[0]-=times if @pc_direction==:left
   # This isn't correct.
-  @pc = 0 if @pc==@rom.length
-  @pc = @rom.length-1 if @pc==-1
+  @pc[0] = 0 if @pc[0]==@rom.length
+  @pc[0] = @rom.length-1 if @pc[0]==-1
  end
 end
 
