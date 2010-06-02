@@ -1,17 +1,44 @@
+# Jumps & Core
 opcode '"' do push_special_mode("\"") end
 opcode "@" do exit end
 opcode ">" do @pc_direction=:right end
 opcode "<" do @pc_direction=:left end
+opcode "^" do @pc_direction=:up end
+opcode "v" do @pc_direction=:down end
+
+opcode "?" do
+ j=rand(4)
+ @pc_direction= case j
+  when 0 then :right
+  when 1 then :left
+  when 2 then :up
+  else :down
+ end
+end
+
 opcode "_" do
  k=@stack.pop_zero # This isn't specified but appears to be the behaviour.
  @pc_direction = :left if k!=0
  @pc_direction = :right if k==0
 end
-opcode ":" do @stack.push(@stack[-1]) end
+
 opcode "#" do {:repeat_pc=>2} end
+
+# IO
 opcode "," do
  $stdout.putc @stack.pop
- $stdout.flush end
+ $stdout.flush
+end
+opcode "." do
+ $stdout.puts "%i" % @stack.pop_zero
+ $stdout.flush
+end
+opcode "~" do
+ a = $stdin.getc
+ a = 0 if a == nil
+ @stack.push(a)
+end
+
 opcode '0' do @stack.push(0) end
 opcode '1' do @stack.push(1) end
 opcode '2' do @stack.push(2) end
@@ -22,17 +49,40 @@ opcode '6' do @stack.push(6) end
 opcode '7' do @stack.push(7) end
 opcode '8' do @stack.push(8) end
 opcode '9' do @stack.push(9) end
+
+# Get and put
 opcode 'g' do
  y=@stack.pop_zero
  x=@stack.pop_zero
  @stack.push(@rom.round(y).round(x))
 end
+opcode 'p' do
+ y=@stack.pop_zero
+ x=@stack.pop_zero
+ value=@stack.pop_zero
+ a=@rom[x % rom.length]
+ a[y % a.length] = value
+end
+
+# Logic
 opcode '`' do
  a=@stack.pop_zero
  b=@stack.pop_zero
  @stack.push 1 if b>a
  @stack.push 0 unless b>a
 end
+
+# Stack manipulations
+opcode ":" do @stack.push(@stack[-1]) end
+opcode "$" do @stack.pop end
+opcode "\\" do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(a)
+ @stack.push(b)
+end
+
+# Math
 opcode '+' do
  a=@stack.pop_zero
  b=@stack.pop_zero
@@ -43,7 +93,21 @@ opcode '-' do
  b=@stack.pop_zero
  @stack.push(b-a)
 end
-
+opcode '/' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(b/a)
+end
+opcode '*' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(b*a)
+end
+opcode '%' do
+ a=@stack.pop_zero
+ b=@stack.pop_zero
+ @stack.push(b % a)
+end
 
 special_mode '"' do |x|
  @stack.push(x) unless x=='"'[0]
