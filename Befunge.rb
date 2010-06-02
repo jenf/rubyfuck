@@ -21,6 +21,11 @@ opcode "_" do
  @pc_direction = :left if k!=0
  @pc_direction = :right if k==0
 end
+opcode "|" do
+ k=@stack.pop_zero # This isn't specified but appears to be the behaviour.
+ @pc_direction = :up if k!=0
+ @pc_direction = :down if k==0
+end
 
 opcode "#" do {:repeat_pc=>2} end
 
@@ -55,13 +60,15 @@ opcode 'g' do
  y=@stack.pop_zero
  x=@stack.pop_zero
  @stack.push(@rom.round(y).round(x))
+ debug "Get %i from %i %i" % [@stack[-1],x,y]
 end
 opcode 'p' do
  y=@stack.pop_zero
  x=@stack.pop_zero
  value=@stack.pop_zero
- a=@rom[x % rom.length]
- a[y % a.length] = value
+ debug "Put %i to %i %i (prev %i)" % [value,x,y,@rom.round(y).round(x)]
+ a=@rom[y % @rom.length]
+ a[x % a.length] = value
 end
 
 # Logic
@@ -70,6 +77,11 @@ opcode '`' do
  b=@stack.pop_zero
  @stack.push 1 if b>a
  @stack.push 0 unless b>a
+end
+opcode '!' do
+ a=@stack.pop_zero
+ @stack.push 0 if a!=0
+ @stack.push 1 if a==0
 end
 
 # Stack manipulations
@@ -116,7 +128,12 @@ special_mode '"' do |x|
 end
 
 pc_read = Proc.new {
- @rom.round(@pc[1]).round(@pc[0])
+
+ a=@rom.round(@pc[1]).round(@pc[0])
+ debug "%c PC: %s %s" % [a, @pc.inspect, @stack.inspect]
+# sleep(0.1)
+ a
+
 }
 
 pc :start=>[0,0], :pc_read=>pc_read do |values|
@@ -125,8 +142,8 @@ pc :start=>[0,0], :pc_read=>pc_read do |values|
   times=values[:repeat_pc] unless values[:repeat_pc]==nil
   @pc[0]+=times if @pc_direction==:right
   @pc[0]-=times if @pc_direction==:left
-  @pc[1]+=times if @pc_direction==:up
-  @pc[1]-=times if @pc_direction==:down
+  @pc[1]-=times if @pc_direction==:up
+  @pc[1]+=times if @pc_direction==:down
  end
 end
 
