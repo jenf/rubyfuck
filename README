@@ -1,0 +1,7 @@
+Full Brainfuck support (I believe)
+Partial Befunge support (enough to run hello world)
+
+To run
+
+./cpu Brainfuck.rb <brainfuck file>
+./cpu Befunge.rb <befunge file>

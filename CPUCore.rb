@@ -98,7 +98,7 @@ class CPULoader
    return if nil == j
    values = {}
    #debug "%x PC: %i %i %i" % [j, @pc, @dp, @mem[@dp]]
-   debug "%c PC: %i %s" % [j, @pc, @stack.inspect]
+   #debug "%c PC: %i %s" % [j, @pc, @stack.inspect]
    if nil != @special_mode[-1]
     debug "Special mode %s" % j
     if @special_modes.include?(@special_mode[-1][0])
