@@ -137,6 +137,8 @@ class CPULoader
       k = @opcodes[j][:block].call
       values.merge!(k) if k.is_a?(Hash)
       debug "Return : " + k.inspect
+     else
+      $stderr.puts "Warning unknown opcode %x" % (j) 
      end
    end
    if nil == @pc_block

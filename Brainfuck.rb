@@ -35,7 +35,7 @@ opcode "]" do
         count+=1
       end
     end
-    {:instruction_size=>0}
+    {:instruction_size=>0} # Don't advance the PC
   end
 end
 

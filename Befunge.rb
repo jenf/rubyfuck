@@ -1,31 +1,40 @@
+
+befunge98=true
+
 # Jumps & Core
 opcode '"' do push_special_mode("\"") end
+special_mode '"' do |x|
+ @stack.push(x) unless x=='"'[0]
+ debug @stack.inspect
+ pop_special_mode if x=='"'[0]
+end
+
 opcode "@" do exit end
-opcode ">" do @pc_direction=:right end
-opcode "<" do @pc_direction=:left end
-opcode "^" do @pc_direction=:up end
-opcode "v" do @pc_direction=:down end
+opcode ">" do @pc_direction=[1,0] end
+opcode "<" do @pc_direction=[-1,0] end
+opcode "^" do @pc_direction=[0,-1] end
+opcode "v" do @pc_direction=[0,1] end
 
 opcode "?" do
  j=rand(4)
  @pc_direction= case j
-  when 0 then :right
-  when 1 then :left
-  when 2 then :up
-  else :down
+  when 0 then [0,-1]
+  when 1 then [0,1]
+  when 2 then [1,0]
+  else [-1,0]
  end
 end
 
 # Conditional Jumps
 opcode "_" do
  k=@stack.pop_zero # This isn't specified but appears to be the behaviour.
- @pc_direction = :left if k!=0
- @pc_direction = :right if k==0
+ @pc_direction = [-1,0] if k!=0
+ @pc_direction = [1,0] if k==0
 end
 opcode "|" do
  k=@stack.pop_zero # This isn't specified but appears to be the behaviour.
- @pc_direction = :up if k!=0
- @pc_direction = :down if k==0
+ @pc_direction = [0,-1] if k!=0
+ @pc_direction = [0,1] if k==0
 end
 
 opcode "#",:instruction_size=>2 do end # Do nothing
@@ -125,10 +134,24 @@ opcode '%' do
  @stack.push(0)     if a==0
 end
 
-special_mode '"' do |x|
- @stack.push(x) unless x=='"'[0]
- debug @stack.inspect
- pop_special_mode if x=='"'[0]
+
+opcode ' ' do end # Noop
+
+# Befunge 98 extensions
+if befunge98
+ opcode 'a' do @stack.push(0xa) end
+ opcode 'b' do @stack.push(0xb) end
+ opcode 'c' do @stack.push(0xc) end
+ opcode 'd' do @stack.push(0xd) end
+ opcode 'e' do @stack.push(0xe) end
+ opcode 'f' do @stack.push(0xf) end
+ opcode 'n' do @stack=[] end
+ opcode 'z' do end # Noop
+ opcode 'r' do @pc_direction = [-@pc_direction[0],-@pc_direction[1]] end
+ opcode ';' do push_special_mode(";") end
+ special_mode ';' do |x|
+  pop_special_mode if x==';'[0]
+ end
 end
 
 pc_read = Proc.new {
@@ -142,10 +165,10 @@ pc_read = Proc.new {
 
 pc :start=>[0,0], :pc_read=>pc_read do |values|
  times=values[:instruction_size]
- @pc[0]+=times if @pc_direction==:right
- @pc[0]-=times if @pc_direction==:left
- @pc[1]-=times if @pc_direction==:up
- @pc[1]+=times if @pc_direction==:down
+ vertical = @pc_direction[1]
+ horizontal = @pc_direction[0]
+ @pc[0]+=horizontal*times
+ @pc[1]+=vertical*times
 end
 
 h=IO.readlines(ARGV[1]).collect {|line| line.chomp}
