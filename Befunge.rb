@@ -114,13 +114,15 @@ end
 opcode '/' do
  a=@stack.pop_zero
  b=@stack.pop_zero
- @stack.push(b/a)
+ @stack.push(b/a) if a!=0
+ @stack.push(0)   if a==0
 end
 
 opcode '%' do
  a=@stack.pop_zero
  b=@stack.pop_zero
- @stack.push(b % a)
+ @stack.push(b % a) if a!=0
+ @stack.push(0)     if a==0
 end
 
 special_mode '"' do |x|
