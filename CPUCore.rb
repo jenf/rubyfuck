@@ -38,7 +38,7 @@ class CPULoader
   @pc_args = {}
  end
  def debug(a)
-#  puts a
+ # puts a
  end
  def load(*args, &block)
   # Convert a parameter to a hash.
@@ -59,9 +59,10 @@ class CPULoader
   args.each { |arg| opcode options.merge(:opcode=>arg), &block }
   return unless args.empty?
   debug "Defining opcode " + (options.inspect)
+  options[:block]=block
   opcode = options[:opcode]
   opcode = opcode[0] if opcode.is_a?(String)
-  @opcodes[opcode] = block
+  @opcodes[opcode] = options
  end
  
  def special_mode(*args,&block)
@@ -71,6 +72,7 @@ class CPULoader
   debug "Defining special mode " + (options.inspect)
   opcode = options[:opcode]
   opcode = opcode[0] if opcode.is_a?(String)
+
   @special_modes[opcode] = block
  end
 
@@ -117,7 +119,7 @@ class CPULoader
    j = @rom[@pc] unless @pc_args.include? :pc_read
    j = @pc_args[:pc_read].call if @pc_args.include? :pc_read
    return if nil == j
-   values = {}
+   values = {:instruction_size=>1}
    #debug "%x PC: %i %i %i" % [j, @pc, @dp, @mem[@dp]]
    #debug "%c PC: %i %s" % [j, @pc, @stack.inspect]
    if nil != @special_mode[-1]
@@ -125,19 +127,20 @@ class CPULoader
     if @special_modes.include?(@special_mode[-1][0])
       debug @special_modes[j].inspect
       k = @special_modes[@special_mode[-1][0]].call(j)
-      values.merge(k) if k.is_a?(Hash)
+      values.merge!(k) if k.is_a?(Hash)
       debug "Return : " + k.inspect
      end
    else
      if @opcodes.include?(j)
+      values.merge!(@opcodes[j]) # Take the options for this opcode.
       #debug @opcodes[j].inspect
-      k = @opcodes[j].call
+      k = @opcodes[j][:block].call
       values.merge!(k) if k.is_a?(Hash)
       debug "Return : " + k.inspect
      end
    end
    if nil == @pc_block
-    @pc+=1 unless values[:no_inc_pc]==true
+    @pc+=values[:instruction_size]
    else
     @pc_block.call(values)
    end

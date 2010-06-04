@@ -28,7 +28,7 @@ opcode "|" do
  @pc_direction = :down if k==0
 end
 
-opcode "#" do {:repeat_pc=>2} end
+opcode "#",:instruction_size=>2 do end # Do nothing
 
 # IO
 opcode "," do
@@ -141,14 +141,11 @@ pc_read = Proc.new {
 }
 
 pc :start=>[0,0], :pc_read=>pc_read do |values|
- if values[:no_inc_pc]!=true
-  times=1
-  times=values[:repeat_pc] unless values[:repeat_pc]==nil
-  @pc[0]+=times if @pc_direction==:right
-  @pc[0]-=times if @pc_direction==:left
-  @pc[1]-=times if @pc_direction==:up
-  @pc[1]+=times if @pc_direction==:down
- end
+ times=values[:instruction_size]
+ @pc[0]+=times if @pc_direction==:right
+ @pc[0]-=times if @pc_direction==:left
+ @pc[1]-=times if @pc_direction==:up
+ @pc[1]+=times if @pc_direction==:down
 end
 
 h=IO.readlines(ARGV[1]).collect {|line| line.chomp}

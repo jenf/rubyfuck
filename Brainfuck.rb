@@ -35,7 +35,7 @@ opcode "]" do
         count+=1
       end
     end
-    {:no_inc_pc=>true}
+    {:instruction_size=>0}
   end
 end
 
