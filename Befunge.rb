@@ -148,9 +148,21 @@ if befunge98
  opcode 'n' do @stack=[] end
  opcode 'z' do end # Noop
  opcode 'r' do @pc_direction = [-@pc_direction[0],-@pc_direction[1]] end
+ 
  opcode ';' do push_special_mode(";") end
  special_mode ';' do |x|
   pop_special_mode if x==';'[0]
+ end
+ 
+ opcode '\'',:instruction_size=>2 do
+  @stack.push(@rom.round(@pc[1]+@pc_direction[1]).round(@pc[0]+@pc_direction[0]))
+ end
+ opcode 's',:instruction_size=>2 do
+  a=@rom[(@pc[1]+@pc_direction[1]) % @rom.length]
+  a[(@pc[0]+@pc_direction[0]) % a.length] = @stack.pop
+ end
+ opcode 'k' do
+  @interate=@stack.pop
  end
 end
 
@@ -164,11 +176,15 @@ pc_read = Proc.new {
 }
 
 pc :start=>[0,0], :pc_read=>pc_read do |values|
+ if @iterate == 0
  times=values[:instruction_size]
  vertical = @pc_direction[1]
  horizontal = @pc_direction[0]
  @pc[0]+=horizontal*times
  @pc[1]+=vertical*times
+ else
+  @iterate -=1
+ end
 end
 
 h=IO.readlines(ARGV[1]).collect {|line| line.chomp}
@@ -184,5 +200,6 @@ h.map! {|x|
  x=x+(" "*(max-x.length))
 }
 rom :string=>h,:invisible_codespace=>true
+register :name=>:@iterate,:initial=>0 # Repeat the next instruction iterator
 register :name=>:@stack,:initial=>[]
 register :name=>:@pc_direction,:initial=>:right
